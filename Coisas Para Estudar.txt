@@ -1,0 +1,8 @@
+Strings                    ->
+Struct                     ->
+Ponteiros                  ->
+Alocação Dinamica          ->
+Listas/pilhas e filas      ->
+#if #def                   ->    
+Leitura Externa            ->
+Criação de Biblioteca      ->
