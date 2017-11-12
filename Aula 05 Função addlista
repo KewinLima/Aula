@@ -1,0 +1,15 @@
+void addlista(Lista *cabeca, Lista novo)
+{
+    Lista *auxNovo;
+
+    auxNovo = (Lista*)malloc(sizeof(Lista));
+    *auxNovo = novo;
+
+    while(cabeca->proximo != NULL)
+    {
+        cabeca = cabeca->proximo;
+    }
+
+    cabeca->proximo = auxNovo;
+    auxNovo->proximo = NULL;
+}
