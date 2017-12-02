@@ -1,0 +1,206 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct lista
+{
+    int num;
+    struct lista *esq;
+    struct lista *dir;
+    struct lista *pai;
+};
+
+struct pilha
+{
+    struct lista *endereco;
+    struct pilha *prox;
+};
+
+typedef struct lista Lista;
+typedef struct pilha Pilha;
+void addarvore(Lista *nodo, Lista *novo, char direcao);
+void imprimearvore (Lista *nodo);
+void buscarpre (Lista *raiz);
+int jatem(Pilha *nodo, Lista *novo);
+void addpilha (Pilha *cabeca, Pilha *novo);
+void imprimepilha(Pilha *nodo);
+
+int main(void)
+{
+    Lista *cabeca;
+    Lista m1 = {8, NULL, NULL, NULL};
+    Lista m2 = {4, NULL, NULL, NULL};
+    Lista m3 = {10, NULL, NULL, NULL};
+    Lista m4 = {9 , NULL, NULL, NULL};
+    Lista m5 = {2 , NULL, NULL, NULL};
+    Lista m6 = {5 , NULL, NULL, NULL};
+    Lista m7 = {1 , NULL, NULL, NULL};
+    Lista m8 = {3 , NULL, NULL, NULL};
+    Lista m9 = {7 , NULL, NULL, NULL};
+    Lista m10 ={6, NULL, NULL, NULL};
+    Pilha p1 = {&m1, NULL} , p2 = {&m2, NULL}, p3 = {&m2, NULL}, p4 = {&m2, NULL};
+
+    addarvore(&m1, &m2, 'e');
+    addarvore(&m1, &m3, 'd');
+    addarvore(&m2, &m5, 'e'); //meu coração diz que isso tá erradp
+    addarvore(&m2, &m6, 'd');
+    addarvore(&m3, &m4, 'e');
+    addarvore(&m6, &m9, 'd');
+    addarvore(&m9, &m10, 'e');
+    addarvore(&m5, &m7, 'e');
+    addarvore(&m5, &m8, 'd');
+/*
+    printf("| m1 %d| m2 %d| m3 %d| m4 %d| m5 %d| m6 %d| m7 %d| m8 %d| m9 %d|m10 %d|\n", m1.num, m2.num, m3.num, m4.num, m5.num, m6.num, m7.num, m8.num, m9.num, m10.num);
+    printf("|end %d|end %d|end %d|end %d|end %d|end %d|end %d|end %d|end %d|end %d|\n", &m1, &m2, &m3, &m4, &m5, &m6, &m7, &m8, &m9, &m10);
+    printf("|pai %d|pai %d|pai %d|pai %d|pai %d|pai %d|pai %d|pai %d|pai %d|pai %d|\n", m1.pai, m2.pai, m3.pai, m4.pai, m5.pai, m6.pai, m7.pai, m8.pai, m9.pai, m10.pai);
+*/
+    buscarpre(&m1);
+/*
+    addpilha(&p1, &p2);
+    addpilha(&p1, &p3);
+    addpilha(&p1, &p4);
+
+    imprimepilha(&p1);
+
+    int d = jatem(&p1, &m2);
+    printf("jatem? = %d \n", d);
+*/
+    return 0;
+}
+
+void addarvore(Lista *nodo, Lista *novo, char direcao)
+{
+    Lista *informacao;
+    informacao = nodo;
+ //   printf("Endereco do Nodo antes %d\n", nodo);
+ //   printf("Endereco de inf  antes %d\n\n", informacao);
+ //   printf("Auxiliar novo %d \n", novo->num);
+    if(direcao == 'e')
+    {
+        nodo->esq = novo;
+        nodo = novo;
+    }
+    else if(direcao == 'd')
+    {
+        nodo->dir = novo;
+        nodo = novo;
+    }
+//    printf("Endereco do Nodo depois %d\n", nodo);
+//    printf("Endereco de inf  depois %d\n\n", informacao);
+
+    nodo->pai = informacao;
+    nodo->esq = NULL;
+    nodo->dir = NULL;
+}
+
+void buscarpre (Lista *raiz)
+{
+    Lista *root;
+    root = raiz;
+    Pilha valor[100]={};
+    unsigned int i=1, j=0, k=0;
+    valor[0].endereco = raiz;
+    printf("%d\n", raiz->num);
+
+    while(j!=1)//enquanto a raiz não aparecer 2 vezes
+    {
+        while(raiz->esq != NULL)
+        {
+            raiz = raiz->esq;
+            printf("Andei esq \n");
+            printf("estou %d\n", raiz->num);
+            valor[i].endereco = raiz;
+            addpilha(valor, &valor[i]);
+            i++;
+        }
+        if(raiz->dir != NULL)
+        {
+            raiz = raiz->dir;
+            printf("Andei dir \n");
+            printf("estou %d\n", raiz->num);
+            valor[i].endereco = raiz;
+            addpilha(valor, &valor[i]);
+            i++;
+        }
+        else
+        {
+            while(1)//enquanto a raiz não aparecer 2 vezes
+            {
+               raiz = raiz->pai;
+               printf("voltei p pai \n");
+               printf("estou %d\n", raiz->num);
+               valor[i].endereco = raiz;
+               addpilha(valor, &valor[i]);
+               k = jatem(valor, raiz);
+               //printf("k == %d\n", k);
+               i++;
+               if(k == 0)
+                    break;
+            }
+            if(raiz->dir != NULL)
+            {
+                raiz = raiz->dir;
+                valor[i].endereco = raiz;
+                printf("Andei dir \n");
+            }
+            else
+            {
+                raiz = raiz->pai;
+                valor[i].endereco = raiz;
+                printf("voltei p pai \n");
+            }
+            printf("estou %d\n", raiz->num);
+            valor[i].endereco = raiz;
+            addpilha(valor, &valor[i]);
+            i++;
+        }
+        j = jatem(valor, root);
+       // printf("A raiz principal jatem? %d \n", j);
+    }
+    imprimepilha(valor);
+}
+
+void addpilha (Pilha *cabeca, Pilha *novo)
+{
+        while(cabeca->prox!= NULL)
+        {
+            cabeca = cabeca->prox;
+        }
+        cabeca->prox = novo;
+        cabeca = cabeca->prox;
+        cabeca->prox = NULL;
+}
+
+int jatem(Pilha *nodo, Lista *elemento)
+{
+    unsigned int i = 0;
+     while(nodo != NULL)
+    {
+        //printf("Endereco do nodo atual: %d\n", nodo->endereco);
+        if(nodo->endereco == elemento && nodo->endereco != NULL)
+        {
+        //    printf("Entrei\n");
+            i++;
+            if(i==3)
+            {
+         //       printf("Entrei no if\n");
+                return 1;
+            }
+        }
+        nodo = nodo->prox;
+    }
+    return 0;
+}
+
+void imprimepilha(Pilha *nodo)
+{
+    Lista *arvore;
+
+    printf("NULL->");
+    while(nodo != NULL)
+    {
+        arvore = nodo->endereco;
+        printf("%d->", arvore->num);
+        nodo = nodo->prox;
+    }
+    printf("NULL \n");
+}
