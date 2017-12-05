@@ -81,16 +81,26 @@ void buscarpre (Lista *raiz)
     i++;
     while(j!=1)//enquanto a raiz não aparecer 3 vezes
     {
-        while(raiz->esq != NULL)
+        if(raiz->esq == NULL && repeticao(valor, raiz)!= 1)
         {
-            raiz = raiz->esq;
-            printf("Andei esq \n");
-            printf("estou %d\n", raiz->num);
             valor[i].endereco = raiz;
             addpilha(valor, &valor[i]);
             i++;
         }
-        if(raiz->dir != NULL)
+        else
+        {
+            while(raiz->esq != NULL && repeticao(valor, raiz) != 1)
+            {
+                raiz = raiz->esq;
+                printf("Andei esq \n");
+                printf("estou %d\n", raiz->num);
+                valor[i].endereco = raiz;
+                addpilha(valor, &valor[i]);
+                i++;
+            }
+        }
+
+        if(raiz->dir != NULL && repeticao(valor, raiz) != 1)
         {
             raiz = raiz->dir;
             printf("Andei dir \n");
