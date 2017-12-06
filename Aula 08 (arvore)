@@ -1,0 +1,203 @@
+/*  #####################################################################
+    # Aluna : Ana Beatriz                                               #
+    # Data : 06/12/2017                                                 #
+    # Código: Busca em arvore binaria                                   #
+    # O algoritimo tem como objetivo fazer uma busca em qualquer        #
+    # tipo de arvore binaria.                                           #
+    # A metologia utilizada foi baseada em uma busca completa por       #
+    # todos os espaços da arvore, criou-se uma pilha auxiliar onde      #
+    # guardou-se todas os elementos vizitados.                          #
+    #                                                                   #
+    #  Tomando como regra:                                              #
+    #  1 repetição na lista  -> andar para esquerda                     #
+    #  2 repetições na lista -> andar para direita                      #
+    #  3 repetições na lista -> voltar para o pai                       #
+    #                                                                   #
+    #  Quando a raiz principal repetir 3 vezes a busca estará completa. #
+    #####################################################################
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+//Define o tamanho do vetor que cria a pilha de informacao
+#define TAM 100
+
+//Cria a estrutura arvore
+struct arvore
+{
+    int num;
+    struct arvore *esq;
+    struct arvore *dir;
+    struct arvore *pai;
+};
+
+//Cria a estrutura pilha
+struct pilha
+{
+    struct arvore *endereco;
+    struct pilha *prox;
+};
+
+typedef struct arvore Arvore;
+typedef struct pilha Pilha;
+void addarvore(Arvore *nodo, Arvore *novo, char direcao);
+void imprimearvore (Arvore *nodo);
+void buscarpre (Arvore *raiz);
+void addpilha (Pilha *nodo, Pilha *novo);
+void imprimepilha(Pilha *nodo);
+int repeticao(Pilha *nodo, Pilha *elemento);
+
+int main(void)
+{
+    Arvore *cabeca;
+    Arvore m1 = {1, NULL, NULL, NULL};
+    Arvore m2 = {2, NULL, NULL, NULL};
+    Arvore m3 = {3, NULL, NULL, NULL};
+    Arvore m4 = {4 , NULL, NULL, NULL};
+    Arvore m5 = {5 , NULL, NULL, NULL};
+    Arvore m6 = {6 , NULL, NULL, NULL};
+    Arvore m7 = {7 , NULL, NULL, NULL};
+    Arvore m8 = {8 , NULL, NULL, NULL};
+    Arvore m9 = {9 , NULL, NULL, NULL};
+    Arvore m10 ={10, NULL, NULL, NULL};
+
+    //Cria a todo o corpo da arvore
+    addarvore(&m8, &m1, 'd');
+    addarvore(&m8, &m3, 'e');
+    addarvore(&m3, &m6, 'e');
+    addarvore(&m3, &m10, 'd');
+    addarvore(&m1, &m5, 'e');
+    addarvore(&m1, &m9, 'd');
+    addarvore(&m9, &m2, 'd');
+    addarvore(&m2, &m7, 'e');
+    addarvore(&m2, &m4, 'd');
+
+    buscarpre(&m8);
+
+    return 0;
+}
+
+void buscarpre (Arvore *raiz)
+{
+    int i=0, rep=0;
+    Pilha valor[TAM]={};
+    valor[i].endereco = raiz;
+    addpilha(valor, &valor[i]);
+    printf("Estou %d \n", raiz->num);
+
+    //Enquanto a raiz não aparecer 3 vezes na pilha
+    while(repeticao(valor, &valor[0]) != 3)
+    {
+        rep = repeticao(valor,&valor[i]);
+        i++;
+        switch (rep)
+        {
+            case 1: //Se aparecer 1 vez ande para a esquerda
+            {
+                if(raiz->esq != NULL)
+                {
+                    raiz = raiz->esq;
+                    printf("Andei esquerda\n");
+                }
+                else
+                {
+                    printf("esquerda nula\n");
+                }
+                break;
+            }
+            case 2: //Se aparecer 2 vezes ande para a direita
+            {
+                if(raiz->dir != NULL)
+                {
+                    raiz = raiz->dir;
+                    printf("Andei direita\n");
+                }
+                else
+                {
+                    printf("direita nula\n");
+                }
+                break;
+            }
+            case 3: //Se aparecer 3 vezes volte para o pai
+            {
+                if(raiz->pai != NULL)
+                {
+                    raiz = raiz->pai;
+                    printf("Andei Pai\n");
+                }
+                break;
+            }
+            default:
+            {
+                printf("ERRO\n");
+                break;
+            }
+        }
+        valor[i].endereco = raiz;
+        addpilha(valor, &valor[i]);
+        printf("Estou %d \n", raiz->num);
+    }
+    printf("Terminado\n");
+    imprimepilha(valor);
+}
+
+//Função que adiciona elementos na arvore
+void addarvore(Arvore *nodo, Arvore *novo, char direcao)
+{
+    Arvore *informacao;
+    informacao = nodo;
+    if(direcao == 'e')
+    {
+        nodo->esq = novo;
+        nodo = novo;
+    }
+    else if(direcao == 'd')
+    {
+        nodo->dir = novo;
+        nodo = novo;
+    }
+    nodo->pai = informacao;
+    nodo->esq = NULL;
+    nodo->dir = NULL;
+}
+
+//Função que adiciona elementos na pilha
+void addpilha (Pilha *nodo, Pilha *novo)
+{
+        while(nodo->prox!= NULL)
+        {
+            nodo = nodo->prox;
+        }
+        nodo->prox = novo;
+        nodo = nodo->prox;
+        nodo->prox = NULL;
+}
+
+//Função que retorna quantas vezes o elemento apareceu na pilha
+int repeticao(Pilha *nodo, Pilha *elemento)
+{
+    int i = 0;
+    while(nodo != NULL)
+    {
+        if(nodo->endereco == elemento->endereco)
+            i++;
+        nodo = nodo->prox;
+    }
+    return i;
+}
+
+//Função que imprime a pilha
+void imprimepilha(Pilha *nodo)
+{
+    Arvore *arvore;
+
+    printf("NULL->");
+    while(nodo != NULL)
+    {
+        arvore = nodo->endereco;
+        printf("%d->", arvore->num);
+        nodo = nodo->prox;
+    }
+    printf("NULL \n");
+}
