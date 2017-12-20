@@ -1,0 +1,6 @@
+late?cachorro:NULL:&m1:NULL
+mia?gato:&m0:&m2:NULL
+ruge?leao:&m1:&m3:NULL
+corre?leopardo:&m2:&m4:&m3
+pequeno?passarinho:&m3:NULL:NULL
+listrado?zebra:&m3:NULL:NULL
